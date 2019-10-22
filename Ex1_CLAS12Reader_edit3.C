@@ -67,17 +67,19 @@ void Ex1_CLAS12Reader_edit3(){
    //auto* hmiss2=new TH1F("missM2","missM2",200,0,2);
    //auto* hmiss3=new TH1F("missM3","missM3",200,-1,1);
    auto* hmK0=new TH1F("mK0","mK0",100,0,1);
-   auto* hBeta=new TH2F("mB","mB",100,0,3,100,-2,2);
+   auto* hBeta=new TH2F("mBeta","mBeta",100,0,3,100,-2,2);
    auto* hBeta1=new TH2F("hBeta1","hBeta1",100,0,3,100,-2,2);
+   auto* hBeta2=new TH2F("hBeta2","hBeta2",100,0,3,100,-2,2);
+   auto* hBeta3=new TH2F("hBeta3","hBeta3",100,0,3,100,-2,2);
    //auto* hm2gCut=new TH1F("m2gCut","m2g",200,0,1);
 
    gBenchmark->Start("timer");
    int counter=0;
 
 
-   for(Int_t i=0;i<files->GetEntries();i++){
+for(Int_t i=0;i<files->GetEntries();i++){
      //create the event reader
-     clas12reader c12(files->At(i)->GetTitle());
+ clas12reader c12(files->At(i)->GetTitle());
      //  clas12reader c12(files->At(i)->GetTitle(),{0});//add tags {tag1,tag2,tag3,...}
 
       //Add some event Pid based selections
@@ -90,7 +92,7 @@ void Ex1_CLAS12Reader_edit3(){
       //////c12.addZeroOfRestPid();  //nothing else
       //////c12.useFTBased(); //and use the Pids from RECFT
 
-      while(c12.next()==true){
+ while(c12.next()==true){
        // c12.event()->getStartTime(); //hipo4
        // c12.head()->getStartTime(); //hipo3
         //Loop over all particles to see how to access detector info.
@@ -100,13 +102,18 @@ void Ex1_CLAS12Reader_edit3(){
    p->getTime();
    p->getBeta();
 	 p->getP();
+   p->getCharge();
 	 p->getDetEnergy();
 	 p->getDeltaEnergy();
 
 	 Double_t Beta_calc=p->getP()/sqrt(pow(0.13957,2)+pow(p->getP(),2));
    Double_t DeltaBeta=Beta_calc-p->getBeta();
 
-   hBeta1->Fill(p->getP(),DeltaBeta);
+   if(p->getCharge()>0)hBeta1->Fill(p->getP(),DeltaBeta);
+   if(p->getCharge()>0)hBeta2->Fill(p->getP(),Beta_calc);
+   if(p->getCharge()>0)hBeta3->Fill(p->getP(),p->getBeta());
+
+
 /*
          p->getPx();
          p->getPy();
@@ -157,7 +164,7 @@ void Ex1_CLAS12Reader_edit3(){
        auto pips=c12.getByID(211);
        auto pims=c12.getByID(-211);
 
-       if(electrons.size() == 1 && protons.size() == 0 && pips.size() == 1 && pims.size() == 1){
+ if(electrons.size() == 1 && protons.size() == 0 && pips.size() == 1 && pims.size() == 1){
 
 	 // set the particle momentum
 	 SetLorentzVector(el,electrons[0]);
@@ -189,7 +196,7 @@ void Ex1_CLAS12Reader_edit3(){
    gBenchmark->Stop("timer");
    gBenchmark->Print("timer");
    TCanvas* can=new TCanvas();
-   can->Divide(2,2);
+   can->Divide(2,3);
    can->cd(1);
    hmiss->DrawCopy();
    can->cd(2);
@@ -198,6 +205,10 @@ void Ex1_CLAS12Reader_edit3(){
    hBeta->DrawCopy("colz");
    can->cd(4);
    hBeta1->DrawCopy("colz");
+   can->cd(5);
+   hBeta2->DrawCopy("colz");
+   can->cd(6);
+   hBeta3->DrawCopy("colz");
 
    //hm2gCut->SetLineColor(2);
    //hm2gCut->DrawCopy("same");
