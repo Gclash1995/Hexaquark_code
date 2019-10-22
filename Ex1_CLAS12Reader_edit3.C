@@ -71,6 +71,8 @@ void Ex1_CLAS12Reader_edit3(){
    auto* hBeta1=new TH2F("hBeta1","hBeta1",100,0,3,100,-2,2);
    auto* hBeta2=new TH2F("hBeta2","hBeta2",100,0,3,100,-2,2);
    auto* hBeta3=new TH2F("hBeta3","hBeta3",100,0,3,100,-2,2);
+   auto* hBeta4=new TH2F("hBeta4","hBeta4",100,0,3,100,-2,2);
+   auto* hBeta5=new TH2F("hBeta5","hBeta5",100,0,3,100,-2,2);
    //auto* hm2gCut=new TH1F("m2gCut","m2g",200,0,1);
 
    gBenchmark->Start("timer");
@@ -102,16 +104,16 @@ for(Int_t i=0;i<files->GetEntries();i++){
    p->getTime();
    p->getBeta();
 	 p->getP();
-   p->getCharge();
+   p->par()->getCharge();
 	 p->getDetEnergy();
 	 p->getDeltaEnergy();
 
 	 Double_t Beta_calc=p->getP()/sqrt(pow(0.13957,2)+pow(p->getP(),2));
    Double_t DeltaBeta=Beta_calc-p->getBeta();
 
-   if(p->getCharge()>0)hBeta1->Fill(p->getP(),DeltaBeta);
-   if(p->getCharge()>0)hBeta2->Fill(p->getP(),Beta_calc);
-   if(p->getCharge()>0)hBeta3->Fill(p->getP(),p->getBeta());
+   if(p->par()->getCharge()>0)hBeta1->Fill(p->getP(),DeltaBeta);
+   if(p->par()->getCharge()>0)hBeta2->Fill(p->getP(),Beta_calc);
+   if(p->par()->getCharge()>0)hBeta3->Fill(p->getP(),p->getBeta());
 
 
 /*
@@ -183,6 +185,8 @@ for(Int_t i=0;i<files->GetEntries();i++){
 	 //if(TMath::Abs(miss.M2())<0.5)hm2gCut->Fill(pi0.M());
    Double_t DeltaBeta=pip.Beta()-pips[0]->getBeta();
    hBeta->Fill(pip.P(),DeltaBeta);
+   hBeta4->Fill(pip.P(),pip.Beta());
+   hBeta5->Fill(pip.P(),pips[0]->getBeta());
 
 	 //could also get particle time etc. here too
 	 //Double_t eTime=electrons[0]->sci(FTOF1A)->getTime();
@@ -196,7 +200,7 @@ for(Int_t i=0;i<files->GetEntries();i++){
    gBenchmark->Stop("timer");
    gBenchmark->Print("timer");
    TCanvas* can=new TCanvas();
-   can->Divide(2,3);
+   can->Divide(2,2);
    can->cd(1);
    hmiss->DrawCopy();
    can->cd(2);
@@ -205,11 +209,17 @@ for(Int_t i=0;i<files->GetEntries();i++){
    hBeta->DrawCopy("colz");
    can->cd(4);
    hBeta1->DrawCopy("colz");
-   can->cd(5);
-   hBeta2->DrawCopy("colz");
-   can->cd(6);
-   hBeta3->DrawCopy("colz");
 
+   TCanvas* can2=new TCanvas();
+   can2->Divide(2,1);
+   can2->cd(1);
+   hBeta2->DrawCopy("colz");
+   can2->cd(2);
+   hBeta3->DrawCopy("colz");
+   can2->cd(3);
+   hBeta4->DrawCopy("colz");
+   can2->cd(4);
+   hBeta5->DrawCopy("colz");
    //hm2gCut->SetLineColor(2);
    //hm2gCut->DrawCopy("same");
 
