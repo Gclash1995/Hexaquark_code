@@ -1,2 +1,2 @@
-# Hexaquark_phd
-PhD code
+# Hexaquark_code
+Hexaquark code
