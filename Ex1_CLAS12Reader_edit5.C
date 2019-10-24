@@ -193,7 +193,7 @@ for(Int_t i=0;i<files->GetEntries();i++){
 
 	 //if(TMath::Abs(miss.M2())<0.5)hm2gCut->Fill(pi0.M());
    Double_t DeltaBeta=pip.Beta()-pips[0]->par()->getBeta();
-   if(DeltaBeta>-0.06 && DeltaBeta<0.06)hBeta->Fill(pip.P(),DeltaBeta);
+   if(DeltaBeta>-0.06 && DeltaBeta<0.06 && pip.P()>0.18)hBeta->Fill(pip.P(),DeltaBeta);
    //hBeta4->Fill(pip.P(),pip.Beta());
    //hBeta5->Fill(pip.P(),pips[0]->par()->getBeta());
    TLorentzVector miss=beam+target-el-pip-pim;
@@ -217,6 +217,27 @@ for(Int_t i=0;i<files->GetEntries();i++){
    hBeta->FitSlicesY();
    TH1D *hBeta_1 = (TH1D*)gDirectory->Get("hBeta_1");
    TH1D *hBeta_2 = (TH1D*)gDirectory->Get("hBeta_2");
+
+   TH1D *hBeta_1_copy1 = (TH1D*)hBeta_1->Clone("hBeta_1_copy1");
+   TH1D *hBeta_1_copy2 = (TH1D*)hBeta_1->Clone("hBeta_1_copy2");
+
+   TH1D *hBeta_2_copy1 = (TH1D*)hBeta_2->Clone("hBeta_2_copy1");
+   TH1D *hBeta_2_copy2 = (TH1D*)hBeta_2->Clone("hBeta_2_copy2");
+
+   hBeta_2_copy1->Scale(3);
+   hBeta_2_copy2->Scale(-3);
+
+   hBeta_1_copy1->Add(hBeta_2_copy1);
+   hBeta_1_copy2->Add(hBeta_2_copy2);
+
+   //Fit my mean + - sigma with 4th order poly.
+
+   TF1 *f1 = new TF1("f1","[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)",0,3);
+   TF1 *f2 = new TF1("f2","[0]+[1]*x+[2]*pow(x,2)+[3]*pow(x,3)+[4]*pow(x,4)",0,3);
+
+   hBeta_1_copy1->Fit("f1");
+   hBeta_1_copy2->Fit("f2");
+
    gBenchmark->Stop("timer");
    gBenchmark->Print("timer");
 
@@ -232,11 +253,16 @@ for(Int_t i=0;i<files->GetEntries();i++){
    hBeta1->DrawCopy("colz");
 
    TCanvas* can2=new TCanvas();
-   can2->Divide(1,2);
+   can2->Divide(2,2);
    can2->cd(1);
    hBeta_1->DrawCopy();
    can2->cd(2);
    hBeta_2->DrawCopy();
+   can2->cd(3);
+   hBeta_1_copy1->DrawCopy();
+   can2->cd(4);
+   hBeta_1_copy2->DrawCopy();
+
 
 /*
    can2->Divide(2,2);
