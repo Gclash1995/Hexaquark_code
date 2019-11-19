@@ -94,19 +94,8 @@ gROOT->ProcessLine(".L ./Loader.C+");
                  //vertex.SetXYZT(p->par()->getVx(), p->par()->getVy(), p->par()->getVz(), p->par()->getVt());
 
 
-                 //Deltabetas for different particles
-                 Double_t Beta_calcpr=p->par()->getP()/sqrt(pow(0.938,2)+pow(p->par()->getP(),2));
-                 Double_t DeltaBetapr=Beta_calcpr - p->par()->getBeta();
-
-                 Double_t Beta_calckp=p->par()->getP()/sqrt(pow(0.49368,2)+pow(p->par()->getP(),2));
-                 Double_t DeltaBetakp=Beta_calckp-p->par()->getBeta();
-
-                 Double_t Beta_calcpic=p->par()->getP()/sqrt(pow(0.13957,2)+pow(p->par()->getP(),2));
-                 Double_t DeltaBetapic=Beta_calcpic-p->par()->getBeta();
-
-
                  //Setting 4 vector of momentum if it passes the deltabeta cuts
-                 if(p->par()->getPid()==2212 && abs(DeltaBetapr)<0.02){
+                 if(p->par()->getPid()==2212){
                    p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.938);
                    //count the number of protons in this event
                    protonno=protonno+1;
