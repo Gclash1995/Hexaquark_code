@@ -45,9 +45,9 @@ gROOT->ProcessLine(".L ./Loader.C+");
           //TLorentzVector vertex;
           vector<double> beta;
           Double_t start_time;
-          vector<double> energy, P;
+          vector<double> energy;
+          vector<double> P;
           vector<double> charge;
-          vector<double> vertex_position;
           vector<double> chi2PID;
 
           skim4_5201_Tree.Branch("p4",&v_p4);
@@ -114,14 +114,14 @@ gROOT->ProcessLine(".L ./Loader.C+");
                  }
 
 
-                 else if(p->par()->getPid()==321 && abs(DeltaBetakp)<0.02){
+                 else if(p->par()->getPid()==321){
                    p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.49368);
                    //count the number of positve kaons in this event
                    kaonpno=kaonpno+1;
 
                  }
 
-                else if(p->par()->getPid()==211 && abs(DeltaBetapic)<0.02){
+                else if(p->par()->getPid()==211){
                   p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.13957);
                   //count the number of positve pions in this event
                   pipno=pipno+1;
@@ -129,7 +129,7 @@ gROOT->ProcessLine(".L ./Loader.C+");
                 }
 
 
-                else if(p->par()->getPid()==-211 && abs(DeltaBetapic)<0.02){
+                else if(p->par()->getPid()==-211){
                   p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.13957);
                   //count the number of negative pions in this event
                   pimno=pimno+1;
