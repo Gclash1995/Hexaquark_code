@@ -30,10 +30,10 @@ gROOT->ProcessLine(".L ./Loader.C+");
           auto files=fake.GetListOfFiles();
 
           //Name of Tree file
-          TFile f("skim4_5201_Tree1.root","recreate");
+          TFile f("skim4_Tree1.root","recreate");
 
           //Creating TTree object
-          TTree skim4_5201_Tree("skim4_5201_Tree","a tree mate");
+          TTree skim4_Tree("skim4_Tree","a tree mate");
 
 
 
@@ -54,21 +54,28 @@ gROOT->ProcessLine(".L ./Loader.C+");
           Int_t kaonpno;
           Int_t pipno;
           Int_t pimno;
+          auto db=TDatabasePDG::Instance();
+          TLorentzVector beam(0,0,10.6,10.6);
+          TLorentzVector target(0,0,0,db->GetParticle(2212)->Mass());
 
 
-          skim4_5201_Tree.Branch("p4",&v_p4);
-          skim4_5201_Tree.Branch("start_time",&start_time);
-          skim4_5201_Tree.Branch("beta",&beta);
-          skim4_5201_Tree.Branch("energy",&energy);
-          skim4_5201_Tree.Branch("P",&P);
-          skim4_5201_Tree.Branch("charge",&charge);
-          skim4_5201_Tree.Branch("vertex",&v_vertex);
-          skim4_5201_Tree.Branch("chi2PID",&chi2PID);
-          skim4_5201_Tree.Branch("chargetracks",&chargetracks,"chargetracks/I");
-          skim4_5201_Tree.Branch("protonno",&protonno,"protonno/I");
-          skim4_5201_Tree.Branch("kaonpno",&kaonpno,"kaonpno/I");
-          skim4_5201_Tree.Branch("pipno",&pipno,"pipno/I");
-          skim4_5201_Tree.Branch("pimno",&pimno,"pimno/I");
+          skim4_Tree.Branch("p4",&v_p4);
+          skim4_Tree.Branch("start_time",&start_time);
+          skim4_Tree.Branch("beta",&beta);
+          skim4_Tree.Branch("energy",&energy);
+          skim4_Tree.Branch("P",&P);
+          skim4_Tree.Branch("charge",&charge);
+          skim4_Tree.Branch("vertex",&v_vertex);
+          skim4_Tree.Branch("chi2PID",&chi2PID);
+          skim4_Tree.Branch("chargetracks",&chargetracks,"chargetracks/I");
+          skim4_Tree.Branch("protonno",&protonno,"protonno/I");
+          skim4_Tree.Branch("kaonpno",&kaonpno,"kaonpno/I");
+          skim4_Tree.Branch("pipno",&pipno,"pipno/I");
+          skim4_Tree.Branch("pimno",&pimno,"pimno/I");
+          skim4_Tree.Branch("beam",&beam);
+          skim4_Tree.Branch("target",&target);
+
+
 
 
 
@@ -110,22 +117,15 @@ gROOT->ProcessLine(".L ./Loader.C+");
 
                  //Setting 4 vector of momentum if it passes the deltabeta cuts
                  if(p->par()->getPid()==2212){
-                   p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.938);
+                   p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),db->GetParticle(2212)->Mass());
                    //count the number of protons in this event
                    protonno=protonno+1;
 
                  }
 
 
-                 else if(p->par()->getPid()==321){
-                   p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.49368);
-                   //count the number of positve kaons in this event
-                   kaonpno=kaonpno+1;
-
-                 }
-
                 else if(p->par()->getPid()==211){
-                  p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.13957);
+                  p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),db->GetParticle(211)->Mass());
                   //count the number of positve pions in this event
                   pipno=pipno+1;
 
@@ -133,10 +133,15 @@ gROOT->ProcessLine(".L ./Loader.C+");
 
 
                 else if(p->par()->getPid()==-211){
-                  p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),0.13957);
+                  p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),db->GetParticle(-211)->Mass());
                   //count the number of negative pions in this event
                   pimno=pimno+1;
 
+                }
+                else if(p->par()->getPid()==11){
+                  p4.SetXYZM(p4.Px(),p4.Py(), p4.Pz(),db->GetParticle(11)->Mass());
+                  //count the number of negative pions in this event
+                  elno=elno+1;
                 }
 
 
@@ -144,11 +149,9 @@ gROOT->ProcessLine(".L ./Loader.C+");
                //counting number of charge particles in each event
                if(p->par()->getCharge()!=0){
                  chargetracks = chargetracks + 1;
-
-
                }
 
-               if(p4.M()>0.01){
+               if(p4.M()>0.0001){
                  v_p4.push_back(p4);
                  beta.push_back(p->par()->getBeta());
                  energy.push_back(p->getDetEnergy());
@@ -156,26 +159,17 @@ gROOT->ProcessLine(".L ./Loader.C+");
                  charge.push_back(p->par()->getCharge());
                  v_vertex.push_back(vertex);
                  chi2PID.push_back(p->par()->getChi2Pid());
-            }
+               }
 
 }
-                   //for loop to decide which data to store based on number of charged particles in event
-                   if(chargetracks>1){
-                     //Fill skim4_5201_Tree
-                     skim4_5201_Tree.Fill();
-
-
-
-
+                   //if statement to decide which data to store based on number of charged particles in event
+                   if(chargetracks>2){
+                     //Fill skim4_Tree
+                     skim4_Tree.Fill();
 
                    }
-
-
-
-
-
                  }
                }
 
-               skim4_5201_Tree.Write();
+               skim4_Tree.Write();
              }
