@@ -41,14 +41,20 @@ gROOT->ProcessLine(".L ./Loader.C+");
           //Creating variables and branches
           vector<TLorentzVector> v_p4;
           TLorentzVector p4;
-          //vector<TLorentzVector> v_vertex;
-          //TLorentzVector vertex;
+          vector<TLorentzVector> v_vertex;
+          TLorentzVector vertex;
           vector<double> beta;
           Double_t start_time;
           vector<double> energy;
           vector<double> P;
           vector<double> charge;
           vector<double> chi2PID;
+          Int_t chargetracks;
+          Int_t protonno;
+          Int_t kaonpno;
+          Int_t pipno;
+          Int_t pimno;
+
 
           skim4_5201_Tree.Branch("p4",&v_p4);
           skim4_5201_Tree.Branch("start_time",&start_time);
@@ -56,8 +62,16 @@ gROOT->ProcessLine(".L ./Loader.C+");
           skim4_5201_Tree.Branch("energy",&energy);
           skim4_5201_Tree.Branch("P",&P);
           skim4_5201_Tree.Branch("charge",&charge);
-          //skim4_5201_Tree.Branch("vertex",&v_vertex);
+          skim4_5201_Tree.Branch("vertex",&v_vertex);
           skim4_5201_Tree.Branch("chi2PID",&chi2PID);
+          skim4_5201_Tree.Branch("chargetracks",&chargetracks,"chargetracks/I");
+          skim4_5201_Tree.Branch("protonno",&protonno,"protonno/I");
+          skim4_5201_Tree.Branch("kaonpno",&kaonpno,"kaonpno/I");
+          skim4_5201_Tree.Branch("pipno",&pipno,"pipno/I");
+          skim4_5201_Tree.Branch("pimno",&pimno,"pimno/I");
+
+
+
 
 
 
@@ -75,23 +89,23 @@ gROOT->ProcessLine(".L ./Loader.C+");
               energy.clear();
               P.clear();
               charge.clear();
-              //v_vertex.clear();
+              v_vertex.clear();
               chi2PID.clear();
 
               //Getting start time for each event
               start_time=c12.event()->getStartTime();
 
-               Int_t chargetracks = 0;
-               Int_t protonno = 0;
-               Int_t kaonpno = 0;
-               Int_t pipno = 0;
-               Int_t pimno = 0;
+              chargetracks = 0;
+              protonno = 0;
+              kaonpno = 0;
+              pipno = 0;
+              pimno = 0;
 
               for(auto& p : c12.getDetParticles()){
                  //  get predefined selected information
 
                  p4.SetXYZM(p->par()->getPx(), p->par()->getPy(), p->par()->getPz(), 0);
-                 //vertex.SetXYZT(p->par()->getVx(), p->par()->getVy(), p->par()->getVz(), p->par()->getVt());
+                 vertex.SetXYZT(p->par()->getVx(), p->par()->getVy(), p->par()->getVz(), 0);
 
 
                  //Setting 4 vector of momentum if it passes the deltabeta cuts
@@ -140,7 +154,7 @@ gROOT->ProcessLine(".L ./Loader.C+");
                  energy.push_back(p->getDetEnergy());
                  P.push_back(p->par()->getP());
                  charge.push_back(p->par()->getCharge());
-                 //v_vertex.push_back(vertex);
+                 v_vertex.push_back(vertex);
                  chi2PID.push_back(p->par()->getChi2Pid());
             }
 
